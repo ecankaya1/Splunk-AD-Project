@@ -24,3 +24,23 @@ The goal of this project was for me to get an understanding of how Splunk works,
 - Splunk: To gather data from the Windows Server & client sent by splunk forwarder. <br>
 - Sysmon: To provide information about process creations, network connections, and changes to file creation time. <br>
 - Atomic Red Team: Emulates attack techniques which tests the effectiveness of security & detection capabilities, each technique corresponds to the MITRE ATT&CK Matrix. <br>
+
+## VM Installation
+
+- 4 VM's will be installed on VirtualBox. <br>
+
+- Windows client (Target Machine): https://www.microsoft.com/en-ca/software-download/windows10
+- Windows Server (AD DC): https://www.microsoft.com/en-us/evalcenter/download-windows-server-2022?msockid=0b85e1f00b9d6dee0806f7600a266ca3
+- Kali Linux (Attacker): https://www.kali.org/get-kali/#kali-virtual-machines
+- Ubuntu Server (Splunk Server): https://ubuntu.com/server
+  <br>
+
+- 
+
+
+ 
+
+
+
+
+
