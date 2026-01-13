@@ -209,7 +209,7 @@ Select read-only, auto mount & make permanent. <br>
 
 ![*TARGET PC NAME CHANGE*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20PC%20Name%20Change.png)
 
-### *Target Machine IP Address
+### *Target Machine IP Address*
 
 - Next I be changing the IP address of the target machine in accordance with the network diagram. <br>
 
