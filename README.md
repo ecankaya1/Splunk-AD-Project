@@ -183,8 +183,6 @@ Select read-only, auto mount & make permanent. <br>
 
 - Then run the command 'sudo ./splunk enable boot-start -user splunk'. (The user flag at the end will make it so anytime the VM reboots, splunk will run with the user splunk). <br>
 
-*SPLUNK BOOT STARTUP*
-
 ![*SPLUNK BOOT STARTUP*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Splunk%20Boot%20Startup.png)
 
 - Now that splunk is up & running, splunk universal forwarder & Sysmon needs to be installed on both the target machine & windows server. <br>
