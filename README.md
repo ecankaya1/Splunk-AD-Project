@@ -187,11 +187,51 @@ Select read-only, auto mount & make permanent. <br>
 
 - Now that splunk is up & running, splunk universal forwarder & Sysmon needs to be installed on both the target machine & windows server. <br>
 
+## Windows Server
+
+- When setting up the Windows server VM, select the relevant language/keyboard then click next > click install now. When asked about what OS to install select 'Windows Server 2022 Standard Evaluation (Desktop Experience)' > hit next & accept the T&C's. For type of installation, select 'Custom: Install Windows only' > click next > select the virtual disk > hit next. Windows server should now start installing. <br>
 
 
 
 
 
+## Target Machine (Windows Client)
+
+- When setting up the Windows 10 Machine select the relevant language/keyboard > click next > click install now > click 'I don't have a product key' & for the OS you want to install, select 'Windows 10 Pro' > hit next > accept the license for the the of installation you want, select 'Custom: Install Windows only' > click next > select the virtual disk, now windows should start installing. Once installed, follow the rest of setup process to your liking. <br>
+
+(Note that when setting up the windows client make sure to select 'Windows 10 Pro' in the windows setup). <br>
+
+![*WINDOWS 10 PRO*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Windows%2010%20Pro.png)
+
+- Firstly change the host name of the machine to 'target-PC'. Do this by typing 'pc' in the search bar > click on properties > 'Rename this PC'. Here I will name it 'target-PC' but you can give it a name of your own choosing > click next > click restart now. <br>
+
+- Once rebooted, to check the name has changed, type 'pc' in the search bar again then click on properties. Here you will see the device name is the name you changed it to. <br>
+
+![*TARGET PC NAME CHANGE*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20PC%20Name%20Change.png)
+
+### *Target Machine IP Address
+
+- Next I be changing the IP address of the target machine in accordance with the network diagram. <br>
+
+- Open up CMD. <br>
+
+- To view the IP address of the computer > type 'ipconfig'. <br>
+
+![*TARGET MACHINE OLD IP ADDRESS*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Old%20IP%20Address.png)
+
+- To change the IP address right click the network icon in the bottom right > click on 'Open Network & Internet settings'. <br>
+
+- Scroll down > click 'Change adapter options' > right click the adapter > click properties. 
+
+- Double click 'Internet Protocol Version 4 (TCP/IPv4)' (Or highlight > click properties). <br>
+
+- Set to a static IP. In the image below I set the IP address, subnet mask, default gateway & DNS address as the following: <br>
+
+![*TARGET MACHINE IP ADDRESS SETTINGS*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20IP%20Address%20Settings.png)
+
+- Once the IP address has been set, to test it has actually worked, open CMD & run the command 'ipconfig' again. <br>
+
+![*TARGET MACHINE NEW IP ADDRESS*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20New%20IP%20Address.png)
 
 
 
