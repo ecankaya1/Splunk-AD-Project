@@ -233,6 +233,122 @@ Select read-only, auto mount & make permanent. <br>
 
 ![*TARGET MACHINE NEW IP ADDRESS*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20New%20IP%20Address.png)
 
+### *Accessing Splunk From The Target Machine*
+
+- Open up the web browser & in the search bar type '192.168.10.10:8000' this is the splunk IP address & it is on port 8000 (splunk listens on port 8000). <br>
+
+(Make sure the Splunk server VM is running in the background). <br>
+
+![*TARGET MACHINE SPLUNK LOGIN PAGE*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Splunk%20Login%20Page.png)
+
+
+
+### *Installing Splunk Universal Forwarder*
+
+- Splunk Universal Forwarder is a streamlined component of the Splunk ecosystem that is primarily used to collect data from various sources and forward it to Splunk indexers for processing and analysis. <br>
+
+- Head over to 'splunk.com' on the target machine & login. <br>
+
+- Once logged in, head over to the platform tab then select 'free trials & downloads'. <br>
+
+- Scroll down to 'Universal Forwarder' > click 'Get My Free Download' & select the correct download for your OS. <br>
+
+- Once downloaded, open up the download. <br>
+
+- Click 'Check this box to accept the License Agreement' & make sure that 'An on-premises Splunk Enterprise instance' is selected > click next. <br>
+
+- For the username I put 'admin' then selected 'Generate random password' > click next. <br>
+
+- I do not have a Deployment, so click next.
+
+- For Receiving Indexer, this will be the IP address of the Splunk server & the default port will be 9997 (port 9997 is the default port for recieving events) > click next > click install. <br>
+
+![*SPLUNK UNIVERSALFORWARDER IP SETUP*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Splunk%20UniversalForwarder%20IP%20Setup.png)
+
+
+### *Sysmon Install*
+
+- Sysmon (System Monitor) logs detailed system activity to the Windows event log which helps identify malicious/anomalous behaviour by monitoring processes, network connections & file changes. <br>
+
+- Open up a browser in the target machine & in the search bar > type 'sysmon'. Open the webpage 'Sysmon - Sysinternals' by Microsoft (https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon). <br>
+
+- Scroll down > select download Sysmon. <br>
+
+- The Sysmon configuration that I'll be using is by olaf. In the search bar type 'sysmon olaf config' > select the GitHub site from 'olafhartong' (https://github.com/olafhartong/sysmon-modular). <br>
+
+- Scroll down & click on'sysmonconfig.xml'. <br>
+
+- Click on 'Raw' on the right hand side (this will open up the config to a full page). <br>
+
+- Right click the page then select save as > save it to a place of your choosing. <br>
+
+- Head over to where the config was downloaded in file explorer. Right click on the Sysmon zip file > click extract all > click extract.
+
+- Once extracted click on the file explorer bar then copy the path file. <br>
+
+![*SYSMON PATH FILE COPY*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Sysmon%20Path%20File%20Copy.png)
+
+- Open up Windows PowerShell as an administrator. <br>
+
+- The reason for copying the file path is so I can quickly change directory by typing & pasting 'cd C:\Users\user\Downloads\Sysmon'. <br>
+
+![*TARGET MACHINE WINDOWS PS PATH FILE*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Windows%20PS%20Path%20File.png)
+
+- Type '.\Sysmon64.exe -i ..\sysmonconfig.xml'(the '-i' flag indicates you want to specify a configuration file) > hit enter. (This will install Sysmon once you hit agree). <br>
+
+![*TARGET MACHINE PS SYSMON INSTALL*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20PS%20Sysmon%20Install.png)
+
+- Now that Splunk Universal Forwarder & Sysmon have been installed, I need to instruct the Splunk forwarder on what gets sent to the Splunk server. <br>
+
+- To do this I must configure a file called 'inputs.conf', this file is located in the C drive > program files > SplunkUniversalForwarder > etc > system > default > input.conf. <br>
+
+- As editing the input.conf file in the default directory can break things, go back into system then into the local directory. Here in the local directory, I will create a new file called 'input.conf'. <br>
+
+- As creating a new file requires administrative privileges, open notepad as as administrator, & paste the following into it: <br>
+
+[WinEventLog://Application] <br>
+index = endpoint <br>
+disabled = false <br>
+
+[WinEventLog://Security] <br>
+index = endpoint <br>
+disabled = false <br>
+
+[WinEventLog://System] <br>
+index = endpoint <br>
+disabled = false <br>
+
+[WinEventLog://Microsoft-Windows-Sysmon/Operational] <br>
+index = endpoint <br>
+disabled = false <br>
+renderXml = true <br>
+source = XmlWinEventLog:Microsoft-Windows-Sysmon/Operational <br>
+
+- It will look like the image below: <br>
+
+![*TARGET MACHINE SYSMON CONFIG FILE*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Sysmon%20Config%20File.png)
+
+(This instructs the splunk forwarder to push events related to application, security & system as well as Sysmon over to the Splunk server). <br>
+
+(In the config file the index is pointing to an index name called endpoint, this is important to know as whatever events fall under the application, security, system & Sysmon categories will be sent over to Splunk & placed under the index endpoint. If the splunk server doesn't have an index named endpoint). <br>
+
+- Save the notepad file under program files > SplunkUniversalForwarder > etc > system > local. Change the save as type to 'All Files' & name the file 'inputs.conf'. <br>
+
+![*TARGET MACHINE SYSMON CONFIG SAVE LOCATION*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Sysmon%20Config%20Save%20Location.png)
+
+- Anytime that the input.conf file is updated, you MUST restart the Splunk Universal Forwarder Service. <br>
+
+- Go to the search bar at the bottom > type services > run it as an administrator > look for the 'SplunkForwarder' service. <br>
+
+- Once found, scroll to the right & under the 'Log On As' column if you see 'NT SERVICE', it may not be able to collect logs due to some of the permissions of the account. <br>
+
+- To fix this > right click the SplunkForwarder service > properties > go to the 'Log On' tab > select 'Local System Account' > hit apply. (Now under the 'Log On As' column it will have changed from NT SERVICE to Local System Account, just to verify scroll down to the service 'Sysmon64' & it will be running). <br>
+
+![*TARGET MACHINE SPLUNK NT SERVICE* ](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Splunk%20NT%20Service.png)
+
+
+
+
 
 
 
