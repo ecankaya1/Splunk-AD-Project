@@ -444,7 +444,44 @@ source = XmlWinEventLog:Microsoft-Windows-Sysmon/Operational <br>
 (Just as an FYI, you cannot ping between windows computers because ICMP is disabled by default. If you want to enable ICMP, you will have to create an inbound rule to allow ICMP traffic, but in this case since we can ping the splunk server I can assume that there is connectivity between the computers). <br>
 
 
+### *Active Directory*
 
+
+- Now that splunk & Sysmon have be installed & configured on the DC, I will install Active Directory Domain Services, head into Server Manager which is located on the taskbar. <br>
+
+- Click manage in the top left > open Add Roles and Features. <br>
+
+- Select next & in installation type make sure 'Role-Based or feature-based installation' is selected. <br>
+
+- Server selection is where you would see all available servers, but since I only have the one, I will select that one. <br>
+
+- In server roles, click on 'Active Directory Domain Services' > click add features. <br>
+
+- Click next until the end of the wizard > click install. <br>
+
+- It will be installed when it says this below the progress bar:
+
+![*DC ADDS INSTALL*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/DC%20ADDS%20Install.png)
+
+- Back in Server Manager, click the flag icon beside manage & you will see the option to Promote this server to a domain controller, click on that. <br>
+
+![*DC PROMOTE*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/DC%20Promote.png)
+
+- In the Deployment Configuration wizard select 'Add a new forest' & fill in the field with a domain name of your choice, I set it to 'emre.local' (the domain name must have a top level domain so the domain name cannot just be 'emre', it must be emre.something). <br>
+
+![*DC DOMAIN NAME*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/AD%20Domain%20Name.png)
+
+- Click next into Domain Controller Options & set a password of your choosing. <br>
+
+- Click next through the wizard until 'Paths', this is where database file named NTDS.dit is stored. (Attackers target domain controllers not only because it has access to everything but because of this file as it contains everything related to Active Directory including password hashes). <br>
+
+![*DC NTDS*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/DC%20NTDS.png)
+
+- Click next through the wizard & once the setup has finished verifying prerequisites > click install. Once the setup is completed the server will automatically restart. <br>
+
+- Once restarted, you will see the domain name followed by a back slash which indicates ADDS has successfully installed & promoted the server to a domain controller. <br>
+
+![*DC DOMAIN SLASH*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/DC%20Domain%20Slash.png)
 
 
 
