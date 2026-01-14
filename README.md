@@ -187,11 +187,6 @@ Select read-only, auto mount & make permanent. <br>
 
 - Now that splunk is up & running, splunk universal forwarder & Sysmon needs to be installed on both the target machine & windows server. <br>
 
-## Windows Server
-
-- When setting up the Windows server VM, select the relevant language/keyboard then click next > click install now. When asked about what OS to install select 'Windows Server 2022 Standard Evaluation (Desktop Experience)' > hit next & accept the T&C's. For type of installation, select 'Custom: Install Windows only' > click next > select the virtual disk > hit next. Windows server should now start installing. <br>
-
-
 
 
 
@@ -344,7 +339,110 @@ source = XmlWinEventLog:Microsoft-Windows-Sysmon/Operational <br>
 
 - To fix this > right click the SplunkForwarder service > properties > go to the 'Log On' tab > select 'Local System Account' > hit apply. (Now under the 'Log On As' column it will have changed from NT SERVICE to Local System Account, just to verify scroll down to the service 'Sysmon64' & it will be running). <br>
 
-![*TARGET MACHINE SPLUNK NT SERVICE* ](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Splunk%20NT%20Service.png)
+![*TARGET MACHINE SPLUNK NT SERVICE*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Splunk%20NT%20Service.png)
+
+- Right click the SplunkForwarder service > click restart. (If it pops up saying windows cannot start the service after clicking restart, just right click SplunkForwarder service > click start). <br>
+
+- Sysmon & Splunkuniversalforwarder have now been installed along with an updated inputs.conf file. <br>
+
+- Head over to the splunk web portal at '192.168.10.10:8000' > log in with the credentials created during the splunk install on the splunk server. <br>
+
+![*TARGET MACHINE WEB PORTAL LOGIN*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Web%20Portal%20Login.png)
+
+- Once logged in navigate to 'Settings at the top' > click on 'Indexes'. <br>
+
+![*TARGET MACHINE INDEXES*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Indexes.png)
+
+- On this page, this is where all of the indexes splunk has, are stored. <br>
+
+- If you recall the inputs.conf file, all of the events are being sent over to an index called endpoint. As there is no index called endpoint in here, this is where will create it. <br>
+
+- At the top right, click 'New Index' > name it 'endpoint' > click save. <br>
+
+![*TARGET MACHINE ENDPOINT INDEX*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Endpoint%20Index.png)
+
+- Scroll down to see the new endpoint index in the stored indexes. <br>
+
+![*TARGET MACHINE INDEX LOCATION*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Index%20Location.png)
+
+- Next I need to make sure that we enable the splunk server to receive the data. <br>
+
+- Navigate to settings at the top > click 'Forwarding and receiving'. <br>
+
+![*TARGET MACHINE FORWARDING AND RECEIVING*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Forwarding%20And%20Receiving.png)
+
+- Under receive data > click configure receiving > click new receiving port in the top right. <br>
+
+- During the Splunk setup, I set the default port of 9997 for receiving events, so for 'Listen on this port' type '9997' > click save. <br>
+
+![*TARGET MACHINE 9997*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%209997.png)
+
+- If everything is set up correctly, you should start seeing data coming in from out target machine. <br>
+
+- To see this, in the top left click Apps > select Search & Reporting. <br>
+
+![*TARGET MACHINE SEARCHING AND REPORTING*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Searching%20And%20Reporting.png)
+
+- In the search bar type in 'index=endpoint' then click search. <br>
+
+![*TARGET MACHINE INDEX=ENDPOINT*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Index%3DEndpoint.png)
+
+- In here you will see all event logs that go to the index endpoint. Just under the search bar you can see how many events total there are. <br>
+
+- Scroll down to 'SELECTED FIELDS' > click 'hosts'. There will be 1 host in here which is the target machine. <br>
+
+![*TARGET MACHINE HOST*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Host.png)
+
+- Below 'host' > click'source'. This will display what I specifically set in the inputs.conf file: Security, Application, System & Sysmon data. <br>
+
+![*TARGET MACHINE SOURCE*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Source.png)
+
+- Seeing this data means that Sysmon and Splunk have successfully been installed and configured for the target machine. Now I will do the exact same for the Windows Server. <br>
+
+
+
+## Windows Server
+
+- When setting up the Windows server VM, select the relevant language/keyboard then click next > click install now. When asked about what OS to install select 'Windows Server 2022 Standard Evaluation (Desktop Experience)' > hit next & accept the T&C's. For type of installation, select 'Custom: Install Windows only' > click next > select the virtual disk > hit next. Windows server should now start installing. <br>
+
+- The Windows Server will act as the Active Directory Domain Controller (AD DC). <br>
+
+- Once installed, log in & change the computer name, the same way I did for the target machine. <br>
+
+- In the taskbar, search 'PC', then right click PC and head into properties then click Rename this PC. <br>
+
+- I set the name for the Windows Server to 'ADDC01', then restarted the VM. <br>
+
+- Once restarted, you can check the name of the server has changed by heading into PC properties. <br>
+
+![*DC NAME CHANGE*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/DC%20Name%20Change.png)
+
+- Next I will set up the Domain Controller (DC) with a static IP address in accordance with the network diagram the same way I did for the target machine. <br>
+
+- Right click the network icon in the bottom right > click 'Open Network & Internet settings' > click 'Change adaptor options' > right click the 'Ethernet' interface > click properties then open the IPv4 option. <br>
+
+- In here, click 'Use the following IP address' & input the settings in accordance with the network diagram. <br>
+
+![*DC IP*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/DC%20IP.png)
+
+- To test the settings have worked, open command prompt > type in the command 'ipconfig' & then type 'ping google.com' to test connectivity. <br>
+
+![*DC IP TEST*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/DC%20IP%20TEST.png)
+
+- Now splunk and Sysmon have to be installed and configured on the DC, this is done the exact same way as it was done on the target machine. <br>
+
+- Once set up, test by pinging the splunk server in the command prompt with 'ping 192.168.10.10'. <br>
+
+![*DC SPLUNK SERVER PING*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/DC%20Splunk%20Server%20Ping.png)
+
+- Now head over to our splunk web portal by typing '192.168.10.10:8000'. <br>
+
+- Heading over to the search and reporting tab and here you will see that it is picking up logs from the DC (ADDC01). <br>
+
+![*DC SPLUNK INDEX*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/DC%20Splunk%20Index.png)
+
+(Just as an FYI, you cannot ping between windows computers because ICMP is disabled by default. If you want to enable ICMP, you will have to create an inbound rule to allow ICMP traffic, but in this case since we can ping the splunk server I can assume that there is connectivity between the computers). <br>
+
 
 
 
