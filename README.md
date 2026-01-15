@@ -484,11 +484,206 @@ source = XmlWinEventLog:Microsoft-Windows-Sysmon/Operational <br>
 ![*DC DOMAIN SLASH*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/DC%20Domain%20Slash.png)
 
 
+### *Adding Users*
+
+- The next step is to create users. <br>
+
+- In Server Manager >click Tools > select Active Directory Users and Computers. <br>
+
+- Expand the domain in the left hand pane, within the 'Builtin' unit will be groups that have been automatically created by AD & you can double click on any of them to see the description of what each group does. In the 'members' tab of a selected group you can see who is assigned to the group & in the 'member of' tab you can see what other groups the selected group is in. (As an FYI you cannot add groups into a builtin group but you can create a custom group & add the builtin group to the custom group). <br>
+
+- In the left hand pane > click 'Users' > here will be a list of users along with additional groups. <br> 
+
+(In a real word environment, users will likely be broken up into different departments known as Organisational Units (OU)). <br>
+
+- To mimic that I will right click the domain in the left hand pane > select new > select Organisational Unit. I will name this OU as 'IT'. Now in the left hand pane there will be a new OU called 'IT'. <br>
+
+- Within this OU > right click the backdrop > select new > select user. <br>
+
+- In here you can fill out the details for a new user, I used 'John Smith' & for user logon name I will set it as 'jsmith' > click next > set the password to whatever you wish (because I am in a lab environment I will uncheck 'User must change password at next logon) > click next & finish. <br>
+
+![*DC NEW USER*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/DC%20New%20User.png)
+
+- Create a new OU called 'HR' & create another user inside the same way as in the 'IT' OU, I used Bob Smith. <br>
+
+- Now there is 2 users that have been created. (There are many scripts available online that can help you auto create users, groups & computers, like the PowerShell script which I used in a previous project). <br>
+
+- Now that AD is setup & the server is the DC, head over to the windows target machine & join it to the newly created domain & authenticate with the John Smith account that was created. <br>
+
+- On the target machine > type 'PC' in the search bar > click properties. <br>
+
+- Scroll down to advanced system settings > in the computer name tab > click change & select domain, type in the domain controller name that was previously created on the windows server. <br>
+
+![*TARGET MACHINE DOMAIN CHANGE*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Domain%20Change.png)
+
+- An error in the image below may pop up, this happens because the target machine does not know how to resolve 'EMRE.LOCAL' & this all stems from how DNS works. <br>
+
+![*TARGET MACHINE DNS ERROR*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20DNS%20Error.png)
+
+- To fix this > right click on the network icon in the bottom right > click network & internet settings > click change adapter options > right click the adaptor > select properties > double click IPv4. <br>
+
+- The DNS server address will be pointing to googles DNS (8.8.8.8), this needs to be changed so it is pointing to the DC (192.168.10.7). <br>
+
+![*TARGET MACHINE DNS CHANGE*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20DNS%20Change.png)
+
+- To test it has changed > open command prompt > type in 'ipconfig /all' & it will show the DNS servers IP address. <br>
+
+![*TARGET MACHINE IPCONFIG ALL*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Ipconfig%20All.png)
+
+- Reattempt to join the domain & a prompt to enter credentials will appear, use the administrator account of the server to log in. <br>
+
+- If successful a popup will appear saying welcome to the domain & then it will prompt you that the computer must be restarted. <br>
+
+- Once restarted & at the login screen, log in with a user that you previously created in AD. I will use John Smith with the username of jsmith. To do this select other user at the bottom left & make sure that 'Sign in to:' says your domain. <br>
+
+- Once logged in, you will have successfully created a new user, joined a computer to a domain & logged in as a domain user. <br>
+
+- Now that I have a mini simulated network, I will use Kali Linux to perform a brute force attack on the windows target machine & afterwards viewing the telemetry in Splunk. After that I will set up and install Atomic red team on the target machine to generate telemetry for certain attack methods attackers may use. <br>
+
+
+
+## Kali Linux
+
+I will be using a pre-built VM of Kali Linux. <br>
+
+- Open up the Kali Linux VM & login. <br>
+
+### *Kali Linux IP Address*
+
+- A static IP address needs to be set up of '192.168.10.250/24' as per the network diagram. <br>
+
+- Right click the ethernet icon at the top > select edit connections > select the first profile which for me was 'Wired Connection 1' & at the bottom click the cog icon. <br>
+
+- Select IPv4 Settings > change it from automatic(DHCP) to manual > click add. <br>
+
+- IP address: 192.168.10.150, Netmask: 24 (as 255.255.255.0 is a /24), Gateway: 192.168.10.1 & DNS: 8.8.8.8 > click save. <br>
+
+![*KALI IP*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Kali%20IP.png)
+
+- To test it has set > head to the desktop > right click the backdrop > click open terminal. <br> 
+
+- Type in the command 'ip a' & you notice the IP address has not changed yet. <br>
+
+![*KALI IP A BEFORE*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Kali%20IP%20A%20Before.png)
+
+- To reflect the changes made > click the ethernet icon in the top right > click disconnect > click on the ethernet icon again > click on the connection that the IP address changes were made to. <br>
+
+- Type in 'ip a' in the terminal again & the IP address will have changed to what it was manually set to. <br>
+
+![*KALI IP A AFTER*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Kali%20IP%20A%20After.png)
+
+- Verify connectivity by pinging google.com in the terminal & to test connectivity to the splunk server, ping the Splunk server. <br>
+
+![*KALI GOOGLE*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Kali%20Google.png)
+
+- Now update & upgrade the repositories in the terminal > type 'sudo apt-get update && sudo apt-get upgrade -y'. <br>
+
+- Once the update & upgrade is finished, set up the attack by creating a new directory called 'ad-project'. <br>
+
+- In the terminal, type 'mkdir ad-project'. This will create a directory on the desktop & all of the files that will be created & used will be put into this directory. <br>
+
+
+### *Patator*
+
+Patator is a multi-threaded brute-force and enumeration tool, which I will be using to perform a brute-force attack for remote desktop on a users account. <br>
+
+(Patator is already installed with kali but to make sure, type in 'sudo apt-get install -y patator').
+
+### *Rockyou*
+
+Rockyou is a popular word list that comes with kali.
+
+- Go to the directory where it is stored by typing 'cd /usr/share/wordlists/'. <br>
+
+- Once in this directory type 'ls' & you will see a file called 'rockyou.txt.gz'. <br>
+
+![*KALI WORDLIST*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Kali%20Wordlist.png)
+
+- This file can be unzipped using gunzip > 'sudo gunzip rockyou.txt.gz'. <br>
+
+- Type in 'ls' to see that it has been unzipped. <br>
+
+![*KALI UNZIP*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Kali%20Unzip.png)
+
+Copy this file to the ad-project file that was previously created. <br>
+
+- Type in 'cp rockyou.txt ~/Desktop/ad-project'. <br>
+
+- Change into the ad-project directory > 'cd ~/Desktop/ad-project'. <br>
+
+- Type 'ls -lh' to see the file & file size, you can see it is 134M, this will contain a lot of passwords, for the sake of this lab I do not want to use all the passwords inside of it so I will just use the first 20 lines. <br>
+
+![*KALI COPY*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Kali%20Copy.png)
+
+- Output the first 20 lines to a file called passwords.txt > type 'head -n 20 rockyou.txt > passwords.txt'. ('head -n 20' specifies the first 20 lines of the file). <br>
+
+- Typing in 'ls' will show the passwords.txt file. <br>
+
+- Read this file by typing 'cat passwords.txt'. <br>
+
+![*KALI CAT*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Kali%20Cat.png)
+
+An attacker would most likely do a lot of reconnaissance & set up basic active directory attacks, but in this scenario I know I want to target a certain password. <br>
+
+- Add a password that was set for the user account on the target machine to the list of passwords.txt> open the file to edit with 'nano passwords.txt' > add the password to the bottom of the list. Once added hit CTRL-X > type 'y' > hit enter. <br>
+
+Read the file again with 'cat passwords.txt', you will see that the chosen password has been added to the bottom of the list. <br>
+
+![*KALI NANO*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Kali%20Nano.png)
+
+Before I launch the attack, remote desktop needs to be enabled on the target machine. <br>
+
+- On the target machine > in the search bar > type 'PC' > click PC properties. <br>
+
+- Scroll down to advanced system settings > log into the administrator account. <br>
+
+- Under the remote tab > select allow remote connections to the computer. <br>
+
+![*TARGET MACHINE REMOTE ENABLE*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Remote%20Enable.png)
+
+- Click select users > click add > put in the 2 users that was previously created in Active Directory. <br>
+
+![*TARGET MACHINE ADD USERS*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Add%20Users.png)
+
+- Click ok & apply these settings. <br>
+
+Now remote desktop has been enabled for the target machine (this can also be done with the same method for the DC). <br>
+
+- In the Kali Linux VM > in the terminal type 'patator -h', this will bring up a help guide. 
+
+- Type in 'patator rdp_login host=192.168.10.100 user=jsmith password=FILE0 0=passwords.txt'. <br>
+
+The 'host' syntax points to the target machines IP, the 'user' syntax points to the user I am gaining the login credentials for & the 'FILE0' syntax with the '0' syntax points to the passwords.txt file that I created. <br>
+
+In a real world scenario, modern Windows RDP is not a good brute force target anymore, this is due to: <br>
+
+NLA (Network Level Authentication) - This forces authentication before the RDP session is created. <br>
+
+CredSSP - RDP with NLA relies on CredSSP, which integrates with: Keberos, NTLM & TLS. This means authentication is handled by the Windows security subsystem, not the RDP service. <br>
+
+Poor Tool Support - Most publicly available tools like patator, hydra & crowbar do not fully implement CredSSP, they also assume legacy NTLM only authentication & fail when NLA is enabled. <br>
+
+Account Lockout - Windows environments typically enforce account lockout thresholds, backoff delays & generic authentication failures. These controls limit the number of attempts an attacker can make before detection or lockout. <br>
+
+NTLM (Network Technology LAN Manager) - Many modern windows systems disable NTLM entirely, restrict NTLM to specific hosts & require keberos for authentication. <br>
+
+MFA - When RDP is available for systems, it tends to be protected with MFA, conditional access policies & RDP Gateway/VPN. MFA basically renders password only brute force attacks useless. <br>
+
+Network Exposure - Best practice is to block RDP from the internet, require a VPN & restrict access by IP or security group. <br>
+
+Attackers now tend to do password spraying via AD services, VPN authentication abuse, phishing & token theft & credential reuse from other breachers. Realistically RDP brute force is noisy, slow & low success. <br>
+
+Once the patator command has been entered in the terminal it will most likely give an error (below image). For this instance I know 'Password1' is the correct password for the users account, but it has given an error due to the listed reasons above <br>
+
+![*KALI PATATOR OUTPUT*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Kali%20Patator%20Output.png)
 
 
 
 
- 
+
+
+
+
 
 
 
