@@ -3,16 +3,29 @@
 <br>
 
 ## Table Of Contents:
+- [Objective](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/README.md#objective)
+- [Skills Learned](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/README.md#skills-learned)
+- [Tools Used](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/README.md#tools-used)
+- [Network Diagram](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/README.md#network-diagram)
+- [VM Installation](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/README.md#vm-installation)
+- [Splunk Server](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/README.md#splunk-server)
+- [Target Machine (Windows Client)](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/README.md#target-machine-windows-client)
+- [Windows Server (AD DC)](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/README.md#windows-server)
+- [Kali Linux (Attacker)](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/README.md#kali-linux)
+- [Atomic Red Team](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/README.md#atomic-red-team)
+
+
 
 ## Objective
 The goal of this project was for me to get an understanding of how Splunk works, get some hands-on & connect it to a Windows server & client. As well as seeing how an attacker may use brute force tools within a network & how new Windows systems defend against it nowadays. Also using Atomic Red Team to generate telemetry & show gaps of security within a network.
 
 ## Skills Learned
-- Networking: Setting up 4 VM's on the same network. <br>
-- Linux: Setting up an Ubuntu 24.04 Server using the CLI & Kali Linux usage. <br>
+- Networking: Setting up 4 VM's in accordance with the network diagram. <br>
+- Linux: Setting up an Ubuntu 24.04 Server using the CLI & Kali Linux usage aswell tools within. <br>
 - Windows Systems: Setting up a Windows Server to act as the Active Directory Domain Controller with a client connected. <br>
 - Splunk: The installation of Splunk aswell as the operating of Splunk. <br>
-- Atomic Red Team: Installing Atomic Red Team which links to the MITRE ATT&CK framework & using it within PowerShell. <br>
+- Atomic Red Team: Installing Atomic Red Team which links to the MITRE ATT&CK framework]. <br>
+- PowerShell: Using PS to use tools & how the commands work. <br>
 - Security: Knowledge gained on how a system may get attacked & what processes are used to discourage attacks. <br>
 
 ## Tools Used
@@ -401,7 +414,7 @@ source = XmlWinEventLog:Microsoft-Windows-Sysmon/Operational <br>
 
 
 
-## Windows Server
+## Windows Server (AD DC)
 
 - When setting up the Windows server VM, select the relevant language/keyboard then click next > click install now. When asked about what OS to install select 'Windows Server 2022 Standard Evaluation (Desktop Experience)' > hit next & accept the T&C's. For type of installation, select 'Custom: Install Windows only' > click next > select the virtual disk > hit next. Windows server should now start installing. <br>
 
@@ -542,7 +555,7 @@ source = XmlWinEventLog:Microsoft-Windows-Sysmon/Operational <br>
 
 
 
-## Kali Linux
+## Kali Linux (Attacker)
 
 I will be using a pre-built VM of Kali Linux. <br>
 
