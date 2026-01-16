@@ -673,9 +673,118 @@ Network Exposure - Best practice is to block RDP from the internet, require a VP
 
 Attackers now tend to do password spraying via AD services, VPN authentication abuse, phishing & token theft & credential reuse from other breachers. Realistically RDP brute force is noisy, slow & low success. <br>
 
-Once the patator command has been entered in the terminal it will most likely give an error (below image). For this instance I know 'Password1' is the correct password for the users account, but it has given an error due to the listed reasons above <br>
+Once the patator command has been entered in the terminal it will most likely give an error (below image). For this instance I know 'Password1' is the correct password for the users account, but it has given an error due to the listed reasons above. <br>
 
 ![*KALI PATATOR OUTPUT*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Kali%20Patator%20Output.png)
+
+However for the purpose of this lab, even if the brute force fails it will still give me telemetry data. <br>
+
+- Head over to the splunk web portal. <br>
+
+- Because I did the attack I know it was within the last 15 minutes & against the user 'jsmith' so I can narrow down the search. <br>
+
+- In Search & Reporting, in the search bar type 'index=endpoint'. <br>
+
+- Scroll down & in the left pane select EventCode, in here you should ID values, specifically ID '4625' which means an account failed to log in. 
+
+- Beside 4625, in the count column, it will say how many times the event ID has been produced, for me it was 168 as I was tinkering with the patator commands. <br>
+
+![*KALI 4625*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Kali%204625.png)
+
+- Clicking on 4625, will automatically update the search query. <br>
+
+![*KALI QUERY*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Kali%20Query.png)
+
+If you look within the time column, you can see all these events took place at a similar time which is a clear indication of brute force activity. <br>
+
+Now if you look at any of the events & select Show all 61 lines, it will show whose account has failed & where the source of the attempted login came from. <br>
+
+![*KALI SHOW ALL*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Kali%20Show%20All.png)
+
+
+## Atomic Red Team
+
+Atomic Red Team is a useful tool to identify the gaps & visibility in a network system, it also generates telemetry to see if you can actually detect this activity, in my case, via splunk. <br>
+
+- To install Atomic Red Team, open powershell as an administrator. <br>
+
+- Run the following command 'Set-ExecutionPolicy Bypass CurrentUser'. (This command allows scripts to be run for the current user). <br>
+
+![*TARGET MACHINE BYPASS*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Bypass.png)
+
+Before Atomic Red Team can be installed, set an exclusion for the entire C drive as Microsoft defender will detect & remove some of the files from Atomic Red Team. <br>
+
+- In bottom right of the screen click the up arrow > click Windows security > click virus & threat protection > click manage settings > scroll down to add or remove exclusions. <br>
+
+- In here click Add an exclusion > click folder > select the C drive. This will add the exclusion for the C drive. <br>
+
+![*TARGET MACHINE C DRIVE*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20C%20Drive.png)
+
+- To install Atomic Red Team, go back into PowerShell, run the following command 'IEX (IWR 'https://raw.githubusercontent.com/redcanaryco/invoke-atomicredteam/master/install-atomicredteam.ps1' -UseBasicParsing);'. <br>
+
+- Then run the command 'Install-AtomicRedTeam -getAtomics'. <br>
+
+(This will go out & grab Atomic Red Team & install it onto the target machine). <br>
+
+![*TARGET MACHINE ATOMIC INSTALL*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Atomic%20Install.png)
+
+- Once installed > go into C drive in file explorer > click AtomicRedTeam > click on atomics. <br>
+
+- In here will be lots of technique IDs & these map to the MITRE ATT&CK framework. <br>
+
+- Head over to the MITRE ATT&CK framework on the webpage 'https://attack.mitre.org', scroll down to the Matrix for Enterprise & hover over anything in the table, it will be associated with a technique ID. <br>
+
+![*TARGET MACHINE MITRE*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Mitre.png)
+
+For example the one in the image above has an ID of 'T1136.001' which is a local account, head back into the atomics file & see if there is T1136.001 (If there is no technique in the atomics folder, you cannot run a command for it). <br>
+
+![*TARGET MACHINE T1136*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20T1136.png)
+
+- Go into PowerShell & run the command 'Import-Module "C:\AtomicRedTeam\invoke-atomicredteam\Invoke-AtomicRedTeam.psd1" -Force' (This command allows me to run the following commands). <br>
+
+![*TARGET MACHINE INVOKE*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Invoke.png)
+
+- Now I can run the next command 'Invoke-AtomicTest T1136.001'. <br>
+
+This command will automatically generate telemetry based on creating a local account. <br>
+
+![*TARGET MACHINE LOCAL USER*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Local%20User.png)
+
+Look at the username that was created: NewLocalUser, you can head into splunk & search specifically for NewLocalUser. <br>
+
+- In Search & Reporting in Splunk, search 'index=endpoint NewLocalUser'. <br>
+
+![*TARGET MACHINE EVENTS*]](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Events.png)
+
+If no events were to pop up, this will tell you that you're blind to this activity, if an attacker compromised your system & created a local account, with the current settings will not be able to detect that activity. <br>
+
+- To create alerts for this event, in the top right click save as & click Alert, here you can customise the alert & set it so if there was the creation of a NewLocalAccount an alert will trigger. <br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
