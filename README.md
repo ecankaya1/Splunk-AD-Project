@@ -10,8 +10,8 @@
 - [VM Installation](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/README.md#vm-installation)
 - [Splunk Server](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/README.md#splunk-server)
 - [Target Machine (Windows Client)](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/README.md#target-machine-windows-client)
-- [Windows Server (AD DC)](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/README.md#windows-server)
-- [Kali Linux (Attacker)](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/README.md#kali-linux)
+- [Windows Server (AD DC)](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/README.md#windows-server-ad-dc)
+- [Kali Linux (Attacker)](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/README.md#kali-linux-attacker)
 - [Atomic Red Team](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/README.md#atomic-red-team)
 
 
