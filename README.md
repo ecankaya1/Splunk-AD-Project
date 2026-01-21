@@ -767,7 +767,7 @@ Look at the username that was created: NewLocalUser, you can head into splunk & 
 
 - In Search & Reporting in Splunk, search 'index=endpoint NewLocalUser'. <br>
 
-![*TARGET MACHINE EVENTS*]](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Events.png)
+![*TARGET MACHINE EVENTS*](https://github.com/ecankaya1/Splunk-AD-Project/blob/main/Images/Target%20Machine%20Events.png)
 
 If no events were to pop up, this will tell you that you're blind to this activity, if an attacker compromised your system & created a local account, with the current settings will not be able to detect that activity. <br>
 
